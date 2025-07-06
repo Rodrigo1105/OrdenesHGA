@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Orden de Servicio</title>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      .hoja, .hoja * { visibility: visible; }
+      .hoja {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 8.5in;
+        height: 11in;
+        margin: 0;
+        padding: 1in;
+        background: white;
+        box-shadow: none;
+      }
+      .no-print { display: none !important; }
+    }
+    body {
+      background-color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .hoja {
+      width: 8.5in;
+      height: 11in;
+      background-color: #ffffff;
+      margin: auto;
+      padding: 1in;
+      box-sizing: border-box;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .encabezado {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .encabezado img { height: 60px; }
+    .titulo {
+      text-align: center;
+    }
+    .titulo h1 { margin: 0; font-size: 24px; }
+    .titulo h2 { margin: 0; font-size: 16px; font-weight: normal; }
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .col50 { width: 48%; }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea.descripcion {
+      width: 100%;
+      height: 120px;
+      resize: none;
+    }
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+    }
+    .signature-box {
+      width: 45%;
+      text-align: center;
+    }
+    .signature-line {
+      margin-top: 20px;
+      border-top: 1px solid #000;
+      height: 2px;
+    }
+    canvas {
+      border: 1px solid #000;
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+    }
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #0056b3; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="hoja">
+  <div class="encabezado">
+    <img src="https://tse3.mm.bing.net/th/id/OIP.HTXQc8VtLrc5_iOAxC9YFwHaFi?rs=1&pid=ImgDetMain" alt="Logo">
+    <div class="titulo">
+      <h1>ORDEN DE SERVICIO</h1>
+      <h2>SOPORTE LOCAL INFORMÁTICA</h2>
+    </div>
+    <div style="width: 60px;"></div>
+  </div>
+
+  <div class="form-row">
+    <div class="col50">
+      <label for="nombre">Servicio:</label>
+      <input type="text" id="nombre">
+      <label for="servicio" style="margin-top: 10px;">Falla o Servicio Solicitado:</label>
+      <select id="servicio">
+        <option value="SOPORTE SOFTWARE">SOPORTE SOFTWARE</option>
+        <option value="SOPORTE HARDWARE">SOPORTE HARDWARE</option>
+        <option value="PROBLEMAS DE RED">PROBLEMAS DE RED</option>
+        <option value="MANTENIMIENTO DE RED">MANTENIMIENTO DE RED</option>
+        <option value="ENTREGA DE EQUIPO">ENTREGA DE EQUIPO</option>
+        <option value="CONFIGURACION DE CORREO ELECTRONICO">CONFIGURACION DE CORREO ELECTRONICO</option>
+        <option value="SOPORTE MEDIIGSS">SOPORTE MEDIIGSS</option>
+        <option value="SOPORTE DRIVE">SOPORTE DRIVE</option>
+        <option value="LOGUEO DE USUARIO DE DOMINIO">LOGUEO DE USUARIO DE DOMINIO</option>
+        <option value="RESTABLECIMIENTO DE CLAVE">RESTABLECIMIENTO DE CLAVE</option>
+        <option value="SOPORTE REMOTO">SOPORTE REMOTO</option>
+        <option value="CAMBIO DE CLAVE">CAMBIO DE CLAVE</option>
+        <option value="REVISION DE IMPRESORA">REVISION DE IMPRESORA</option>
+        <option value="REVISION DE TELEFONO IP">REVISION DE TELEFONO IP</option>
+        <option value="CAMBIO DE BATERIA">CAMBIO DE BATERIA</option>
+        <option value="REVISION DE UPS">REVISION DE UPS</option>
+        <option value="SOPORTE DE SISTEMA AS400">SOPORTE DE SISTEMA AS400</option>
+        <option value="ATENCION DE PROVEEDORES">ATENCION A PROVEEDORES</option>
+      </select>
+    </div>
+    <div class="col50" style="text-align: right;">
+      <label for="correlativo">Orden No.:</label>
+      <div id="correlativo" style="font-size: 18px; font-weight: bold;"></div>
+      <label for="fecha" style="margin-top: 10px;">Fecha:</label>
+      <input type="text" id="fecha" readonly style="width: 150px;">
+    </div>
+  </div>
+
+  <div class="form-row" style="margin-top: 20px;">
+    <div class="col50" style="flex: 1;">
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" class="descripcion"></textarea>
+      <label for="observaciones" style="margin-top: 10px;">Observaciones:</label>
+      <textarea id="observaciones" class="descripcion"></textarea>
+    </div>
+  </div>
+
+  <div class="signature-section">
+    <div class="signature-box">
+      <label for="tecnico">Técnico:</label>
+      <select id="tecnico">
+        <option>Hector Urbina</option>
+        <option>Byron Ambrosio</option>
+        <option>Jonathan Castillo</option>
+        <option>Bryan Aguilar</option>
+        <option>Brandom Orellana</option>
+        <option>Rodrigo Morales</option>
+      </select>
+      <canvas id="firmaTecnico"></canvas>
+      <div class="signature-line"></div>
+      <p>Firma del Técnico</p>
+    </div>
+    <div class="signature-box">
+      <label for="usuario">Usuario:</label>
+      <input type="text" id="usuario">
+      <canvas id="firmaUsuario"></canvas>
+      <div class="signature-line"></div>
+      <p>Firma del Usuario</p>
+    </div>
+  </div>
+
+  <div class="btn-container no-print">
+    <button type="button" onclick="guardarOrden()">Guardar Orden</button>
+    <button type="button" onclick="window.print()">Imprimir</button>
+    <button type="button" onclick="borrarFirmas()">Borrar Firmas</button>
+  </div>
+</div>
+
+<script>
+function setupFirma(id) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  let dibujando = false;
+
+  canvas.addEventListener('mousedown', e => {
+    dibujando = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+  canvas.addEventListener('mouseup', () => dibujando = false);
+  canvas.addEventListener('mousemove', e => {
+    if (!dibujando) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  });
+
+  canvas.addEventListener('touchstart', e => {
+    dibujando = true;
+    const rect = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+  });
+  canvas.addEventListener('touchend', () => dibujando = false);
+  canvas.addEventListener('touchmove', e => {
+    if (!dibujando) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+    ctx.stroke();
+  });
+}
+
+function borrarFirmas() {
+  ['firmaTecnico', 'firmaUsuario'].forEach(id => {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+}
+
+function guardarOrden() {
+  const correlativo = document.getElementById('correlativo').innerText;
+  const hoja = document.querySelector('.hoja');
+  const fecha = document.getElementById('fecha').value;
+  const firmaClienteBase64 = document.getElementById('firmaUsuario').toDataURL();
+  const firmaTecnicoBase64 = document.getElementById('firmaTecnico').toDataURL();
+
+  document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+  html2canvas(hoja, { scale: 2, useCORS: true }).then(canvas => {
+    document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'letter');
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = 215.9;
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+    const pdfBlob = pdf.output("blob");
+    const reader = new FileReader();
+
+    reader.onloadend = function () {
+      const pdfBase64 = reader.result;
+      fetch("https://script.google.com/macros/s/AKfycbwaARHc4WNkm7lSFdm4Lxb36k_WHy07YEqjZYTL9UdTrKGArXj6qaDWAo_zcIl5rI-Oeg/exec", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    fecha: fecha,
+    nombre: document.getElementById("nombre").value,
+    servicio: document.getElementById("servicio").value,
+    descripcion: document.getElementById("descripcion").value,
+    observaciones: document.getElementById("observaciones").value,
+    tecnico: document.getElementById("tecnico").value,
+    usuario: document.getElementById("usuario").value,
+    firmaCliente: firmaClienteBase64,
+    firmaTecnico: firmaTecnicoBase64,
+    pdfBase64: pdfBase64
+  })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.success) {
+    // Actualiza el correlativo en el HTML con el nuevo valor
+    document.getElementById('correlativo').innerText = data.correlativo;
+    alert("Orden guardada con éxito. Correlativo: " + data.correlativo);
+  } else {
+    alert("Error: " + data.error);
+  }
+})
+.catch(error => {
+  console.error("Error al enviar la solicitud:", error);
+});
+    };
+    reader.readAsDataURL(pdfBlob);
+    pdf.save(`Orden_${correlativo}.pdf`);
+  });
+}
+function cargarCorrelativo() {
+  fetch('https://script.google.com/macros/s/AKfycbwaARHc4WNkm7lSFdm4Lxb36k_WHy07YEqjZYTL9UdTrKGArXj6qaDWAo_zcIl5rI-Oeg/exec')
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        // Asegúrate de que el correlativo se asigna al elemento correcto en el HTMLx
+        document.getElementById('correlativo').innerText = data.correlativo;
+      } else {
+        console.error("Error al obtener correlativo:", data.message);
+      }
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  cargarCorrelativo();
+  const hoy = new Date();
+  const dia = String(hoy.getDate()).padStart(2, '0');
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const anio = hoy.getFullYear();
+  document.getElementById('fecha').value = `${dia}/${mes}/${anio}`;
+  setupFirma('firmaTecnico');
+  setupFirma('firmaUsuario');
+});
+</script>
+</body>
+</html>
